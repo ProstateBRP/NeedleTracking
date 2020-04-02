@@ -6,8 +6,7 @@ Slicer Module for Needle Tracking
 Prerequisite
 ============
 
-This module has been tested only on Slicer 4.8.1. The latest version (4.10.x) may not work due to the implementation of the OpenIGTLink module.
-- [Download Page for Slicer 4.8.1](http://slicer.kitware.com/midas3/folder/274)
+This module has been tested only on Slicer 4.10.x 
 
 Installation
 ============
@@ -17,7 +16,6 @@ Installation
 
 After installing 3D Slicer, add the following extensions (plug-ins) from the Extension Manager:
 
-- CurveMaker
 - SlicerIGT
 
 After adding those extensions, you will be asked to restart 3D Slicer.
@@ -49,16 +47,9 @@ Usage
 
 Network Setting
 ---------------
-The following network configuration is assumed:
-- Siemens MRI Host: 192.168.2.1
-- Slicer Workstation: 192.168.2.5
+The connector setup by the module works as a TCP server. The sender must be configured as a client. If the data is transferred over network, make sure that port 18944 TCP is open.
 
-Make sure that port 18944 TCP is open. To check the network connection, open the command prompt on the MRI host (Advanced User required), and ping the Slicer workstation:
-
-~~~~
-> PING 192.168.2.5
-~~~~
-
+While the module provide the simple interface to setup an OpenIGTLink connector, the user may setup one from the SlicerOpenIGTLink module instead. In this case, the connector can be setup either server or client depending on the configuration of the sender. The rest of the module features do not depend on a specific configuration of the OpenIGTLink connector. 
 
 Setting Up 3D Slicer
 --------------------
@@ -69,48 +60,17 @@ Setting Up 3D Slicer
 - Click the "Active" check box.
 
 
-Starting MR Tracking Sequence
+Starting the sender software
 -----------------------------
 Setup the tracking sequence and start the scan. If the tracking sequence is connected to the 3D Slicer properly, the catheter model should appear on the screen. You may not seen the model during prescan or while the catheter is outside the imaging volume.
 
 
-Testing with Simulator
-======================
-
-You can test the NeedleTracking module using [Tracking Simulator](https://github.com/ProstateBRP/MRCatheterTrackingSim) with the following steps. We assume that both simulator and 3D Slicer are running on the same computer.
-
-
-Setting Up 3D Slicer
---------------------
-- Open 3D Slicer
-- Choose "IGT" -> "NeedleTracking" under the modules menu.
-- Click the "Connector" pull-down menu and choose "Create new IGTLConnector"
-- Make sure to specify "18944" (default) for the Port.
-- Click the "Active" check box.
+Configuring the catheter (needle)
+---------------------------------
+Once Slicer starts receiving TDATA messages from the sender, a TrackingData node will appears in the "TrackingData" pull-down menu. Select the one with the message name and click the "Active" check button below the selector. The user can change the tip length, diameter, and opacity in the "Catheter configuration" menu.
 
 
-Starting Simulator
-------------------
-To start the simulator from the terminal on Linux/Mac
 
-~~~~
-$ cd <SIMULATOR_PATH>/
-$ ./TrackingDataClient localhost 18944 5 <DATA_PATH>/TestTracking.log
-~~~~
-
-"SIMULATOR_PATH" is the path to the folder where the executable file is placed, whereas "DATA_PATH" is the path to the folder where the tracking log file ("TestTracking.log") is placed. "TestTracking.log" comes along with the source code for the simulator.
-
-On Windows,
-
-~~~~
-> cd <path to the simulator>
-> TrackingDataClient localhost 18944 5 <path to the test tracking data>\TestTracking.log
-~~~~
-
-TODOs
------
-- Monitor TrackingData even if the data is coming from different IGTLConnector.
-- Collect ponits for registration
 
 
 

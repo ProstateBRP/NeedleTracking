@@ -6,7 +6,7 @@ from slicer.ScriptedLoadableModule import *
 from NeedleTrackingUtils.trackingdata import *
 from NeedleTrackingUtils.connector import *
 from NeedleTrackingUtils.reslice import *
-from NeedleTrackingUtils.registration import *
+#from NeedleTrackingUtils.registration import *
 import numpy
 import functools
 
@@ -68,8 +68,7 @@ class NeedleTrackingWidget(ScriptedLoadableModuleWidget):
     #
     #--------------------------------------------------
 
-    self.nChannel = 8   # Number of channels / catheter
-    self.nCath = 2 # Number of catheters
+    self.nCath = 1      # Number of catheters
 
     #--------------------------------------------------
     # GUI components
@@ -88,14 +87,10 @@ class NeedleTrackingWidget(ScriptedLoadableModuleWidget):
     # Connector Selector
     #--------------------------------------------------
 
-    self.igtlConnector1 = NeedleTrackingIGTLConnector("Connector 1 (MRI)")
+    self.igtlConnector1 = NeedleTrackingIGTLConnector("Connector 1")
     self.igtlConnector1.port = 18944
     self.igtlConnector1.buildGUI(connectionFormLayout)
 
-    self.igtlConnector2 = NeedleTrackingIGTLConnector("Connector 2 (NavX)")
-    self.igtlConnector2.port = 18945
-    self.igtlConnector2.buildGUI(connectionFormLayout)
-    
     #--------------------------------------------------
     # Catheter
     #--------------------------------------------------
@@ -185,61 +180,14 @@ class NeedleTrackingWidget(ScriptedLoadableModuleWidget):
       self.catheterOpacitySliderWidget[cath].setToolTip("Set the opacity of the catheter")
       configFormLayout.addRow("Cath %d Opacity: " % cath, self.catheterOpacitySliderWidget[cath])
 
-    #--------------------------------------------------
-    # Coil Selection Aare
-    #
-    coilGroupBox = ctk.ctkCollapsibleGroupBox()
-    coilGroupBox.title = "Coil Selection"
-    coilGroupBox.collapsed = True
-    
-    catheterFormLayout.addWidget(coilGroupBox)
-    coilSelectionLayout = qt.QFormLayout(coilGroupBox)
-
     #
     # Check box to show/hide coil labels 
     #
     self.showCoilLabelCheckBox = qt.QCheckBox()
     self.showCoilLabelCheckBox.checked = 0
     self.showCoilLabelCheckBox.setToolTip("Show/hide coil labels")
-    coilSelectionLayout.addRow("Show Coil Labels: ", self.showCoilLabelCheckBox)
-
-    #
-    # Coil seleciton check boxes
-    #
-    self.coilCheckBox = [[None for i in range(self.nChannel)] for j in range(self.nCath)]
-    self.coilOrderDistalRadioButton = [None]*self.nCath
-    self.coilOrderProximalRadioButton = [None]*self.nCath
-    self.coilOrderButtonGroup = [None]*self.nCath
+    configFormLayout.addRow("Show Coil Labels: ", self.showCoilLabelCheckBox)
     
-    for cath in range(self.nCath):
-      for ch in range(self.nChannel):
-        self.coilCheckBox[cath][ch] = qt.QCheckBox()
-        self.coilCheckBox[cath][ch].checked = 0
-        self.coilCheckBox[cath][ch].text = "CH %d" % (ch + 1)
-
-      nChannelHalf = int(self.nChannel/2)
-
-      coilGroup1Layout = qt.QHBoxLayout()
-      for ch in range(nChannelHalf):
-        coilGroup1Layout.addWidget(self.coilCheckBox[cath][ch])
-      coilSelectionLayout.addRow("Cath %d Active Coils:" % cath, coilGroup1Layout)
-      
-      coilGroup2Layout = qt.QHBoxLayout()
-      for ch in range(nChannelHalf):
-        coilGroup2Layout.addWidget(self.coilCheckBox[cath][ch+nChannelHalf])
-      coilSelectionLayout.addRow("", coilGroup2Layout)
-        
-      self.coilOrderDistalRadioButton[cath] = qt.QRadioButton("Distal First")
-      self.coilOrderDistalRadioButton[cath].checked = 1
-      self.coilOrderProximalRadioButton[cath] = qt.QRadioButton("Proximal First")
-      self.coilOrderProximalRadioButton[cath].checked = 0
-      self.coilOrderButtonGroup[cath] = qt.QButtonGroup()
-      self.coilOrderButtonGroup[cath].addButton(self.coilOrderDistalRadioButton[cath])
-      self.coilOrderButtonGroup[cath].addButton(self.coilOrderProximalRadioButton[cath])
-      coilOrderGroupLayout = qt.QHBoxLayout()
-      coilOrderGroupLayout.addWidget(self.coilOrderDistalRadioButton[cath])
-      coilOrderGroupLayout.addWidget(self.coilOrderProximalRadioButton[cath])
-      coilSelectionLayout.addRow("Cath %d Coil Order:" % cath, coilOrderGroupLayout)
 
     #--------------------------------------------------
     # Coordinate System
@@ -298,16 +246,6 @@ class NeedleTrackingWidget(ScriptedLoadableModuleWidget):
     self.reslice.buildGUI(resliceCollapsibleButton)
     
     #--------------------------------------------------
-    # Point-to-Point registration
-    #
-    registrationCollapsibleButton = ctk.ctkCollapsibleButton()
-    registrationCollapsibleButton.text = "Point-to-Point Registration"
-    self.layout.addWidget(registrationCollapsibleButton)
-
-    self.registration =  NeedleTrackingFiducialRegistration()
-    self.registration.buildGUI(registrationCollapsibleButton)
-    
-    #--------------------------------------------------
     # Connections
     #--------------------------------------------------
     self.trackingDataSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onTrackingDataSelected)
@@ -320,14 +258,6 @@ class NeedleTrackingWidget(ScriptedLoadableModuleWidget):
 
     self.showCoilLabelCheckBox.connect('toggled(bool)', self.onCoilLabelChecked)
 
-    for cath in range(self.nCath):
-      for ch in range(self.nChannel):
-        self.coilCheckBox[cath][ch].connect('toggled(bool)', self.onCoilChecked)
-    
-    for cath in range(self.nCath):
-      self.coilOrderDistalRadioButton[cath].connect('clicked(bool)', self.onCoilChecked)
-      self.coilOrderProximalRadioButton[cath].connect('clicked(bool)', self.onCoilChecked)
-    
     self.coordinateRPlusRadioButton.connect('clicked(bool)', self.onSelectCoordinate)
     self.coordinateRMinusRadioButton.connect('clicked(bool)', self.onSelectCoordinate)
     self.coordinateAPlusRadioButton.connect('clicked(bool)', self.onSelectCoordinate)
@@ -360,10 +290,6 @@ class NeedleTrackingWidget(ScriptedLoadableModuleWidget):
       self.activeTrackingCheckBox.checked == False
       
       
-  def onRejectRegistration(self):
-    self.logic.acceptNewMatrix(self, False)
-
-
   def onTipLengthChanged(self, cath, checked):
     print("onTipLengthChanged(%d)" % cath)
     self.logic.setTipLength(self.tipLengthSliderWidget[cath].value, cath)
@@ -380,24 +306,6 @@ class NeedleTrackingWidget(ScriptedLoadableModuleWidget):
     self.logic.setShowCoilLabel(self.showCoilLabelCheckBox.checked)
 
 
-  def onCoilChecked(self):
-    
-    activeCoils1 = [0] * self.nChannel
-    activeCoils2 = [0] * self.nChannel
-    for ch in range(self.nChannel):
-      activeCoils1[ch] = self.coilCheckBox[0][ch].checked
-      activeCoils2[ch] = self.coilCheckBox[1][ch].checked
-
-    coilOrder1 = 'distal'
-    if self.coilOrderProximalRadioButton[0].checked:
-      coilOrder1 = 'proximal'
-    coilOrder2 = 'distal'
-    if self.coilOrderProximalRadioButton[1].checked:
-      coilOrder2 = 'proximal'
-
-    self.logic.setActiveCoils(activeCoils1, activeCoils2, coilOrder1, coilOrder2)
-
-    
   def onSelectCoordinate(self):
 
     rPositive = self.coordinateRPlusRadioButton.checked
@@ -430,10 +338,6 @@ class NeedleTrackingWidget(ScriptedLoadableModuleWidget):
       
     self.showCoilLabelCheckBox.checked = tdata.showCoilLabel
 
-    for ch in range(self.nChannel):
-      self.coilCheckBox[0][ch].checked = tdata.activeCoils1[ch]
-      self.coilCheckBox[1][ch].checked = tdata.activeCoils2[ch]
-    
     if tdata.axisDirection[0] > 0.0:
       self.coordinateRPlusRadioButton.checked = 1
     else:
@@ -551,31 +455,6 @@ class NeedleTrackingLogic(ScriptedLoadableModuleLogic):
     except ValueError:
         return False
 
-
-  def setActiveCoils(self, coils1, coils2, coilOrder1, coilOrder2):
-    #print("setActiveCoils(self, coils1, coils2, coilOrder1, coilOrder2)")
-    nodeID = self.currentTrackingDataNodeID
-    if nodeID:
-      td = self.TrackingData[nodeID]
-      if td:
-        td.activeCoils1 = coils1
-        td.activeCoils2 = coils2
-        if coilOrder1 == 'distal':
-          td.coilOrder1 = True
-        else:
-          td.coilOrder1 = False
-        if coilOrder2 == 'distal':
-          td.coilOrder2 = True
-        else:
-          td.coilOrder2 = False
-
-        tnode = slicer.mrmlScene.GetNodeByID(nodeID)
-        self.updateCatheter(tnode, 0)
-        self.updateCatheter(tnode, 1)
-        
-    return True
-
-
   def setAxisDirections(self, rPositive, aPositive, sPositive):
     
     nodeID = self.currentTrackingDataNodeID
@@ -668,19 +547,12 @@ class NeedleTrackingLogic(ScriptedLoadableModuleLogic):
     
     # Update coordinates in the fiducial node.
     nCoils = tdnode.GetNumberOfTransformNodes()
-    
-    if nCoils > 8: # Max. number of coils is 8.
-      nCoils = 8
-      
+
     td = self.TrackingData[tdnode.GetID()]
-    mask = td.activeCoils1[0:nCoils]
-    if index == 1:
-      mask = td.activeCoils2[0:nCoils]
-    nActiveCoils = sum(mask)
     
-    if curveNode.GetNumberOfControlPoints() != nActiveCoils:
+    if curveNode.GetNumberOfControlPoints() != nCoils:
       curveNode.RemoveAllControlPoints()
-      for i in range(nActiveCoils):
+      for i in range(nCoils):
         p = vtk.vtkVector3d()
         p.SetX(0.0)
         p.SetY(0.0)
@@ -688,23 +560,12 @@ class NeedleTrackingLogic(ScriptedLoadableModuleLogic):
         curveNode.AddControlPoint(p, "P_%d" % i)
         
     lastCoil = nCoils - 1
-    fFlip = False
-    if index == 0:
-      fFlip = (not td.coilOrder1)
-    else: # index == 1:
-      fFlip = (not td.coilOrder2)
 
-    j = 0
     for i in range(nCoils):
-      if mask[i]:
-        tnode = tdnode.GetTransformNode(i)
-        trans = tnode.GetTransformToParent()
-        v = trans.GetPosition()
-        coilID = j
-        if fFlip:
-          coilID = lastCoil - j
-        curveNode.SetNthControlPointPosition(coilID, v[0] * td.axisDirection[0], v[1] * td.axisDirection[1], v[2] * td.axisDirection[2])
-        j += 1
+      tnode = tdnode.GetTransformNode(i)
+      trans = tnode.GetTransformToParent()
+      v = trans.GetPosition()
+      curveNode.SetNthControlPointPosition(i, v[0] * td.axisDirection[0], v[1] * td.axisDirection[1], v[2] * td.axisDirection[2])
 
     curveNode.EndModify(prevState)
     
