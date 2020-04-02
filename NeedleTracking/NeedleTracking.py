@@ -3,30 +3,30 @@ import unittest
 import time
 from __main__ import vtk, qt, ctk, slicer
 from slicer.ScriptedLoadableModule import *
-from MRTrackingUtils.trackingdata import *
-from MRTrackingUtils.connector import *
-from MRTrackingUtils.reslice import *
-from MRTrackingUtils.registration import *
+from NeedleTrackingUtils.trackingdata import *
+from NeedleTrackingUtils.connector import *
+from NeedleTrackingUtils.reslice import *
+from NeedleTrackingUtils.registration import *
 import numpy
 import functools
 
 #------------------------------------------------------------
 #
-# MRTracking
+# NeedleTracking
 #
-class MRTracking(ScriptedLoadableModule):
+class NeedleTracking(ScriptedLoadableModule):
   """MRTrakcing module is available at:
-  https://github.com/tokjun/MRTracking
+  https://github.com/ProstateBRP/NeedleTracking
   """
 
   def __init__(self, parent):
     ScriptedLoadableModule.__init__(self, parent)
-    self.parent.title = "MRTracking" # TODO make this more human readable by adding spaces
+    self.parent.title = "NeedleTracking" # TODO make this more human readable by adding spaces
     self.parent.categories = ["IGT"]
     self.parent.dependencies = []
-    self.parent.contributors = ["Junichi Tokuda (BWH), Wei Wang (BWH), Ehud Schmidt (BWH, JHU)"]
+    self.parent.contributors = ["Junichi Tokuda (BWH)"]
     self.parent.helpText = """
-    Visualization of MR-tracked catheter. 
+    Visualization of shape-sensing needle 
     """
     self.parent.acknowledgementText = """
     This work is supported by NIH (P41EB015898, R01EB020667).
@@ -35,15 +35,15 @@ class MRTracking(ScriptedLoadableModule):
 
 #------------------------------------------------------------
 #
-# MRTrackingWidget
+# NeedleTrackingWidget
 #
-class MRTrackingWidget(ScriptedLoadableModuleWidget):
+class NeedleTrackingWidget(ScriptedLoadableModuleWidget):
   
   def setup(self):
     ScriptedLoadableModuleWidget.setup(self)
     # Instantiate and connect widgets ...
 
-    self.logic = MRTrackingLogic(None)
+    self.logic = NeedleTrackingLogic(None)
     self.logic.setWidget(self)
 
     #--------------------------------------------------
@@ -88,11 +88,11 @@ class MRTrackingWidget(ScriptedLoadableModuleWidget):
     # Connector Selector
     #--------------------------------------------------
 
-    self.igtlConnector1 = MRTrackingIGTLConnector("Connector 1 (MRI)")
+    self.igtlConnector1 = NeedleTrackingIGTLConnector("Connector 1 (MRI)")
     self.igtlConnector1.port = 18944
     self.igtlConnector1.buildGUI(connectionFormLayout)
 
-    self.igtlConnector2 = MRTrackingIGTLConnector("Connector 2 (NavX)")
+    self.igtlConnector2 = NeedleTrackingIGTLConnector("Connector 2 (NavX)")
     self.igtlConnector2.port = 18945
     self.igtlConnector2.buildGUI(connectionFormLayout)
     
@@ -293,7 +293,7 @@ class MRTrackingWidget(ScriptedLoadableModuleWidget):
 
     #resliceLayout = qt.QFormLayout(resliceCollapsibleButton)
 
-    self.reslice = MRTrackingReslice("Image Reslice")
+    self.reslice = NeedleTrackingReslice("Image Reslice")
     self.reslice.nCath = self.nCath
     self.reslice.buildGUI(resliceCollapsibleButton)
     
@@ -304,7 +304,7 @@ class MRTrackingWidget(ScriptedLoadableModuleWidget):
     registrationCollapsibleButton.text = "Point-to-Point Registration"
     self.layout.addWidget(registrationCollapsibleButton)
 
-    self.registration =  MRTrackingFiducialRegistration()
+    self.registration =  NeedleTrackingFiducialRegistration()
     self.registration.buildGUI(registrationCollapsibleButton)
     
     #--------------------------------------------------
@@ -407,7 +407,7 @@ class MRTrackingWidget(ScriptedLoadableModuleWidget):
     self.logic.setAxisDirections(rPositive, aPositive, sPositive)
     
       
-  def onReload(self, moduleName="MRTracking"):
+  def onReload(self, moduleName="NeedleTracking"):
     # Generic reload method for any scripted module.
     # ModuleWizard will subsitute correct default moduleName.
 
@@ -452,9 +452,9 @@ class MRTrackingWidget(ScriptedLoadableModuleWidget):
       
 #------------------------------------------------------------
 #
-# MRTrackingLogic
+# NeedleTrackingLogic
 #
-class MRTrackingLogic(ScriptedLoadableModuleLogic):
+class NeedleTrackingLogic(ScriptedLoadableModuleLogic):
 
   def __init__(self, parent):
     ScriptedLoadableModuleLogic.__init__(self, parent)
@@ -608,7 +608,7 @@ class MRTrackingLogic(ScriptedLoadableModuleLogic):
       return
     
     # Set up markups fiducial node, if specified in the connector node
-    curveNodeID = tdnode.GetAttribute('MRTracking.CurveNode%d' % index)
+    curveNodeID = tdnode.GetAttribute('NeedleTracking.CurveNode%d' % index)
     curveNode = None
 
     #cathName = 'Catheter_%d' % index
@@ -618,18 +618,18 @@ class MRTrackingLogic(ScriptedLoadableModuleLogic):
     else:
       curveNode = self.scene.AddNewNodeByClass('vtkMRMLMarkupsCurveNode')
       ## TODO: Name?
-      tdnode.SetAttribute('MRTracking.CurveNode%d' % index, curveNode.GetID())
+      tdnode.SetAttribute('NeedleTracking.CurveNode%d' % index, curveNode.GetID())
 
     td = self.TrackingData[tdnode.GetID()]
     
     # Set up tip model node
-    tipModelID = tdnode.GetAttribute('MRTracking.tipModel%d' % index)
+    tipModelID = tdnode.GetAttribute('NeedleTracking.tipModel%d' % index)
     if tipModelID != None:
       td.tipModelNode[index] = self.scene.GetNodeByID(tipModelID)
     else:
       td.tipModelNode[index] = None
 
-    tipTransformNodeID = tdnode.GetAttribute('MRTracking.tipTransform%d' % index)
+    tipTransformNodeID = tdnode.GetAttribute('NeedleTracking.tipTransform%d' % index)
     if tipTransformNodeID != None:
       td.tipTransformNode[index] = self.scene.GetNodeByID(tipTransformNodeID)
     else:
@@ -638,7 +638,7 @@ class MRTrackingLogic(ScriptedLoadableModuleLogic):
 
   def onIncomingNodeModifiedEvent(self, caller, event):
 
-    parentID = caller.GetAttribute('MRTracking.parent')
+    parentID = caller.GetAttribute('NeedleTracking.parent')
     
     if parentID == '':
       return
@@ -654,14 +654,14 @@ class MRTrackingLogic(ScriptedLoadableModuleLogic):
     #print("updateCatheterNode(%s, %d) is called" % (tdnode.GetID(), index) )
     # node shoud be vtkMRMLIGTLTrackingDataBundleNode
 
-    curveNodeID = tdnode.GetAttribute('MRTracking.CurveNode%d' % index)
+    curveNodeID = tdnode.GetAttribute('NeedleTracking.CurveNode%d' % index)
     curveNode = None
     if curveNodeID != None:
       curveNode = self.scene.GetNodeByID(curveNodeID)
 
     if curveNode == None:
       curveNode = self.scene.AddNewNodeByClass('vtkMRMLMarkupsCurveNode')
-      tdnode.SetAttribute('MRTracking.CurveNode%d' % index, curveNode.GetID())
+      tdnode.SetAttribute('NeedleTracking.CurveNode%d' % index, curveNode.GetID())
     
     prevState = curveNode.StartModify()
     
@@ -717,7 +717,7 @@ class MRTrackingLogic(ScriptedLoadableModuleLogic):
       return
     
     curveNode = None
-    curveNodeID = tdnode.GetAttribute('MRTracking.CurveNode%d' % index)
+    curveNodeID = tdnode.GetAttribute('NeedleTracking.CurveNode%d' % index)
     if curveNodeID != None:
       curveNode = self.scene.GetNodeByID(curveNodeID)
 
@@ -751,12 +751,12 @@ class MRTrackingLogic(ScriptedLoadableModuleLogic):
     if td.tipModelNode[index] == None:
       td.tipModelNode[index] = self.scene.AddNewNodeByClass('vtkMRMLModelNode')
       td.tipModelNode[index].SetName('Tip')
-      tdnode.SetAttribute('MRTracking.tipModel%d' % index, td.tipModelNode[index].GetID())
+      tdnode.SetAttribute('NeedleTracking.tipModel%d' % index, td.tipModelNode[index].GetID())
         
     if td.tipTransformNode[index] == None:
       td.tipTransformNode[index] = self.scene.AddNewNodeByClass('vtkMRMLLinearTransformNode')
       td.tipTransformNode[index].SetName('TipTransform')
-      tdnode.SetAttribute('MRTracking.tipTransform%d' % index, td.tipTransformNode[index].GetID())
+      tdnode.SetAttribute('NeedleTracking.tipTransform%d' % index, td.tipTransformNode[index].GetID())
 
     ## The 'curve end point matrix' (normal vectors + the curve end position)
     matrix = vtk.vtkMatrix4x4()
@@ -873,7 +873,7 @@ class MRTrackingLogic(ScriptedLoadableModuleLogic):
       # Since TrackingDataBundle does not invoke ModifiedEvent, obtain the first child node
       if tdnode.GetNumberOfTransformNodes() > 0:
         childNode = tdnode.GetTransformNode(0)
-        childNode.SetAttribute('MRTracking.parent', tdnode.GetID())
+        childNode.SetAttribute('NeedleTracking.parent', tdnode.GetID())
         td.eventTag = childNode.AddObserver(vtk.vtkCommand.ModifiedEvent, self.onIncomingNodeModifiedEvent)
         return True
       else:

@@ -1,6 +1,6 @@
-MRTracking
+NeedleTracking
 ==============
-Slicer Module for MR Tracking
+Slicer Module for Needle Tracking
 
 
 Prerequisite
@@ -25,22 +25,22 @@ After adding those extensions, you will be asked to restart 3D Slicer.
 MR Tracking Module
 ------------------
 
-[MR Tracking Module](https://github.com/tokjun/MRTracking) is currently not listed in the Extension Manager, and will need to be installed manually with the following steps:
+[MR Tracking Module](https://github.com/ProstateBRP/NeedleTracking) is currently not listed in the Extension Manager, and will need to be installed manually with the following steps:
 
 - Download the source code by either:
-  - downloading a zipped archive from [this link](https://github.com/tokjun/MRTracking/archive/master.zip)
+  - downloading a zipped archive from [this link](https://github.com/ProstateBRP/NeedleTracking/archive/master.zip)
   - Cloning the repository using the Git command:
 
 ~~~~
-$ git clone https://github.com/tokjun/MRTracking
+$ git clone https://github.com/ProstateBRP/NeedleTracking
 ~~~~
 
 - Extract the source tree if you have downloaded the zipped archive. Save the source tree in your local disk.
 - Launch 3D Slicer and open "Application Settings" form the "Edit" menu.
 - Choose "Modules" from the list on the left of the Application Setting window.
 - In the "Additional module paths," click the "Add" button. If "Add" button is hiddne, click the ">>" button on the right edge of the module list.
-- Choose the "MRTracking" under the source tree. Note that there is a child "MRTracking" folder under the parent "MRTracking" folder. Choose the child one.
-- The module path that shows up on the list would look like: "/Users/junichi/modules/MRTracking/MRTracking" (Confirm that there is "MRTracking" under "MRTracking".
+- Choose the "NeedleTracking" under the source tree. Note that there is a child "NeedleTracking" folder under the parent "NeedleTracking" folder. Choose the child one.
+- The module path that shows up on the list would look like: "/Users/junichi/modules/NeedleTracking/NeedleTracking" (Confirm that there is "NeedleTracking" under "NeedleTracking".
 - Restart 3D Slicer.
 - If the module is installed properly, it should be listed under "IGT" on the Modules menu.
 
@@ -63,7 +63,7 @@ Make sure that port 18944 TCP is open. To check the network connection, open the
 Setting Up 3D Slicer
 --------------------
 - Open 3D Slicer
-- Choose "IGT" -> "MRTracking" under the modules menu.
+- Choose "IGT" -> "NeedleTracking" under the modules menu.
 - Click the "Connector" pull-down menu and choose "Create new IGTLConnector"
 - Make sure to specify "18944" (default) for the Port.
 - Click the "Active" check box.
@@ -77,13 +77,13 @@ Setup the tracking sequence and start the scan. If the tracking sequence is conn
 Testing with Simulator
 ======================
 
-You can test the MRTracking module using [Tracking Simulator](https://github.com/tokjun/MRCatheterTrackingSim) with the following steps. We assume that both simulator and 3D Slicer are running on the same computer.
+You can test the NeedleTracking module using [Tracking Simulator](https://github.com/ProstateBRP/MRCatheterTrackingSim) with the following steps. We assume that both simulator and 3D Slicer are running on the same computer.
 
 
 Setting Up 3D Slicer
 --------------------
 - Open 3D Slicer
-- Choose "IGT" -> "MRTracking" under the modules menu.
+- Choose "IGT" -> "NeedleTracking" under the modules menu.
 - Click the "Connector" pull-down menu and choose "Create new IGTLConnector"
 - Make sure to specify "18944" (default) for the Port.
 - Click the "Active" check box.

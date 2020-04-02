@@ -4,10 +4,10 @@ import slicer
 
 #------------------------------------------------------------
 #
-# MRTrackingIGTLConnector class
+# NeedleTrackingIGTLConnector class
 #
 
-class MRTrackingReslice():
+class NeedleTrackingReslice():
 
   def __init__(self, label="Reslice"):
 
@@ -121,7 +121,7 @@ class MRTrackingReslice():
     if tdnode == None:
       return
 
-    tipTransformNodeID = tdnode.GetAttribute('MRTracking.tipTransform%d' % index)
+    tipTransformNodeID = tdnode.GetAttribute('NeedleTracking.tipTransform%d' % index)
     if tipTransformNodeID == '':
       return
       

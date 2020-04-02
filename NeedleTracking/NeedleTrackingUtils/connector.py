@@ -4,10 +4,10 @@ import slicer
 
 #------------------------------------------------------------
 #
-# MRTrackingIGTLConnector class
+# NeedleTrackingIGTLConnector class
 #
 
-class MRTrackingIGTLConnector():
+class NeedleTrackingIGTLConnector():
 
   def __init__(self, cname="Connector"):
 

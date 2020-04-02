@@ -5,10 +5,10 @@ import functools
 
 #------------------------------------------------------------
 #
-# MRTrackingFiducialRegistration class
+# NeedleTrackingFiducialRegistration class
 #
 
-class MRTrackingFiducialRegistration():
+class NeedleTrackingFiducialRegistration():
 
   def __init__(self, label="Registration"):
 
@@ -128,13 +128,13 @@ class MRTrackingFiducialRegistration():
       return
     
     # Get/create fiducials node for "To" points
-    fromFiducialsNodeID = fromTrackingNode.GetAttribute('MRTracking.RegistrationPointsFrom')
+    fromFiducialsNodeID = fromTrackingNode.GetAttribute('NeedleTracking.RegistrationPointsFrom')
     if fromFiducialsNodeID:
       self.fromFiducialsNode = slicer.mrmlScene.GetNodeByID(fromFiducialsNodeID)
     else:
       self.fromFiducialsNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLMarkupsFiducialNode")
       self.fromFiducialsNode.SetName('RegistrationPointsFrom')
-      fromTrackingNode.SetAttribute('MRTracking.RegistrationPointsFrom', self.fromFiducialsNode.GetID())
+      fromTrackingNode.SetAttribute('NeedleTracking.RegistrationPointsFrom', self.fromFiducialsNode.GetID())
 
     dnode = self.fromFiducialsNode.GetDisplayNode()
     dnode.SetVisibility(self.fiducialsVisible)
@@ -148,13 +148,13 @@ class MRTrackingFiducialRegistration():
       return
 
     # Get/create fiducials node for "From" points
-    toFiducialsNodeID = toTrackingNode.GetAttribute('MRTracking.RegistrationPointsTo')
+    toFiducialsNodeID = toTrackingNode.GetAttribute('NeedleTracking.RegistrationPointsTo')
     if toFiducialsNodeID:
       self.toFiducialsNode = slicer.mrmlScene.GetNodeByID(toFiducialsNodeID)
     else:
       self.toFiducialsNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLMarkupsFiducialNode")
       self.toFiducialsNode.SetName('RegistrationPointsTo')
-      toTrackingNode.SetAttribute('MRTracking.RegistrationPointsTo', self.toFiducialsNode.GetID())
+      toTrackingNode.SetAttribute('NeedleTracking.RegistrationPointsTo', self.toFiducialsNode.GetID())
       
     dnode = self.toFiducialsNode.GetDisplayNode()
     dnode.SetVisibility(self.fiducialsVisible)
