@@ -16,6 +16,7 @@ Installation
 
 After installing 3D Slicer, add the following extensions (plug-ins) from the Extension Manager:
 
+- SlicerOpenIGTLink
 - SlicerIGT
 
 After adding those extensions, you will be asked to restart 3D Slicer.
