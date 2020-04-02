@@ -20,10 +20,10 @@ After installing 3D Slicer, add the following extensions (plug-ins) from the Ext
 
 After adding those extensions, you will be asked to restart 3D Slicer.
 
-MR Tracking Module
-------------------
+Needle Tracking Module
+-----------------------
 
-[MR Tracking Module](https://github.com/ProstateBRP/NeedleTracking) is currently not listed in the Extension Manager, and will need to be installed manually with the following steps:
+[Needle Tracking Module](https://github.com/ProstateBRP/NeedleTracking) is currently not listed in the Extension Manager, and will need to be installed manually with the following steps:
 
 - Download the source code by either:
   - downloading a zipped archive from [this link](https://github.com/ProstateBRP/NeedleTracking/archive/master.zip)
